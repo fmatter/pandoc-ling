@@ -448,7 +448,35 @@ function getTrans (line)
     if line[1].tag == "Quoted" then
       line = line[1].content
     end
+    
+    -- Extract trailing citations and spaces to place them outside the quotes
+    local citations = {}
+    local i = #line
+    while i >= 1 do
+      if line[i].tag == "Cite" or line[i].tag == "Space" then
+        table.insert(citations, 1, line[i])
+        i = i - 1
+      else
+        break
+      end
+    end
+    
+    -- Remove extracted citations from line
+    for j = 1, #citations do
+      table.remove(line)
+    end
+    
+    -- Quote the remaining content
     line = pandoc.Quoted("SingleQuote", line)
+    
+    -- Append citations after the quote
+    if #citations > 0 then
+      local result = {line}
+      for _, cite in ipairs(citations) do
+        table.insert(result, cite)
+      end
+      line = result
+    end
   end
   return pandoc.Plain(line)
 end
