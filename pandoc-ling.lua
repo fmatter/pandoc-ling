@@ -352,11 +352,14 @@ function parseDiv (div)
         local subID = string.match(lineText, "{#([^}]+)}")
         if subID then
           subExIDs[i] = subID
-          -- Remove the {#id} from the actual content
+          -- Remove the {#id} from the actual content and trim whitespace
           for j = #firstLine, 1, -1 do
             local elem = firstLine[j]
             if elem.tag == "Str" and string.match(elem.text, "{#[^}]+}") then
-              firstLine[j] = pandoc.Str(string.gsub(elem.text, "%s*{#[^}]+}", ""))
+              local cleaned = string.gsub(elem.text, "%s*{#[^}]+}%s*", " ")
+              cleaned = string.gsub(cleaned, "^%s+", "")  -- trim leading
+              cleaned = string.gsub(cleaned, "%s+$", "")  -- trim trailing
+              firstLine[j] = pandoc.Str(cleaned)
               break
             end
           end
@@ -368,11 +371,14 @@ function parseDiv (div)
         local subID = string.match(contentText, "{#([^}]+)}")
         if subID then
           subExIDs[i] = subID
-          -- Remove the {#id} from the actual content
+          -- Remove the {#id} from the actual content and trim whitespace
           for j = #content, 1, -1 do
             local elem = content[j]
             if elem.tag == "Str" and string.match(elem.text, "{#[^}]+}") then
-              content[j] = pandoc.Str(string.gsub(elem.text, "%s*{#[^}]+}", ""))
+              local cleaned = string.gsub(elem.text, "%s*{#[^}]+}%s*", " ")
+              cleaned = string.gsub(cleaned, "^%s+", "")  -- trim leading
+              cleaned = string.gsub(cleaned, "%s+$", "")  -- trim trailing
+              content[j] = pandoc.Str(cleaned)
               break
             end
           end
@@ -598,13 +604,13 @@ function pandocMakeExample (parsedDiv)
     example[1] = pandocMakeSingle(parsedDiv)
     -- Set ID if this single example has a sub-example ID
     if parsedDiv.subExIDs and parsedDiv.subExIDs[1] then
-      example[1].attr = pandoc.Attr(parsedDiv.subExIDs[1])
+      example[1].attr = pandoc.Attr(parsedDiv.subExIDs[1], {"linguistic-example"})
     end
   elseif #kind == 1 and kind[1] == "interlinear" then
     example[1] = pandocMakeInterlinear(parsedDiv)
     -- Set ID if this interlinear has a sub-example ID
     if parsedDiv.subExIDs and parsedDiv.subExIDs[1] then
-      example[1].attr = pandoc.Attr(parsedDiv.subExIDs[1])
+      example[1].attr = pandoc.Attr(parsedDiv.subExIDs[1], {"linguistic-example"})
     end
   elseif #kind > 1 and onlySingle then
     example[1] = pandocMakeList(parsedDiv)
@@ -694,7 +700,12 @@ function pandocMakeInterlinear (parsedDiv, label, forceJudge)
   local interlinear = parsedDiv.examples[selection]
   
   local header = {{ interlinear.header }}
-  local headerPresent = interlinear.header.content[1] ~= nil
+  -- Check if header is present AND has meaningful content (not just empty/whitespace)
+  local headerPresent = false
+  if interlinear.header.content[1] ~= nil then
+    local headerText = pandoc.utils.stringify(interlinear.header)
+    headerPresent = headerText:match("%S") ~= nil  -- has non-whitespace
+  end
   local source = interlinear.source 
   for i=1,#source do source[i] = { source[i] } end
   local gloss =  interlinear.gloss 
@@ -896,7 +907,7 @@ function pandocMakeMixedList (parsedDiv)
       result[resultCount]        = pandocMakeInterlinear(parsedDiv, label, forceJudge)
       -- Set ID attribute if this sub-example has an ID
       if parsedDiv.subExIDs and parsedDiv.subExIDs[i] then
-        result[resultCount].attr = pandoc.Attr(parsedDiv.subExIDs[i])
+        result[resultCount].attr = pandoc.Attr(parsedDiv.subExIDs[i], {"linguistic-example"})
       end
       isInterlinear[resultCount] = true
       resultCount = resultCount + 1
@@ -909,7 +920,7 @@ function pandocMakeMixedList (parsedDiv)
         result[resultCount]        = pandocMakeList(parsedDiv, from, to, forceJudge)
         -- For single-line list, check if any items have IDs (just use first for now)
         if parsedDiv.subExIDs and parsedDiv.subExIDs[from] then
-          result[resultCount].attr = pandoc.Attr(parsedDiv.subExIDs[from])
+          result[resultCount].attr = pandoc.Attr(parsedDiv.subExIDs[from], {"linguistic-example"})
         end
         isInterlinear[resultCount] = false
         resultCount = resultCount + 1

@@ -230,9 +230,47 @@ This is a test
 
 Inspired by the `linguex`-approach, you can also use the keywords `next` or `last` to refer to the next or the last example, e.g. `[@last]` will be formatted as [@last]. By doubling the first letters to `nnext` or `llast` reference to the next/last-but-one can be made. Actually, the number of starting letters can be repeated at will in `pandoc-ling`, so something like `[@llllllllast]` will also work. It will be formatted as [@llllllllast] after the processing of `pandoc-ling`. Needless to say that in such a situation an explicit identifier would be a better choice.
 
-Referring to sub-examples can be done by manually adding a suffix into the cross reference, simply separated from the identifier by a space. For example, `[@lllast c]` will refer to the third sub-example of the last-but-two example. Formatted this will look like this: [@llast c], smile! However, note that the "c" has to be manually determined. It is simply a literal suffix that will be copied into the cross-reference. Something like `[@last hA1l0]` will work also, leading to [@last hA1l0] when formatted (which is of course nonsensical).
+### Referring to sub-examples
 
-For exports that include attributes (like html), the examples have an explicit id of the form `exNUMBER` in which `NUMBER` is the actual number as given in the formatted output. This means that it is possible to refer to an example on any web-page by using the hash-mechanism to refer to a part of the web-page. For example `#ex4.7` at can be used to refer to the seventh example in the html-output of this readme (try [this link](https://cysouw.github.io/pandoc-ling/readme.html#ex4.7)). The id in this example has a chapter number '4' because in the html conversion I have set the option `addChapterNumber` to `true`. (Note: when numbers restart the count in each chapter with the option `restartAtChapter`, then the id is of the form `exCHAPTER.NUMBER`. This is necessary to resolve clashing ids, as the same number might then be used in different chapters.)
+Sub-examples can be referenced in two ways:
+
+**Direct ID references (recommended):** Assign custom IDs to individual sub-examples by placing `{#id}` in the header line of an interlinear example. The ID marker will be removed from the output, and the sub-example can be referenced directly.
+
+```
+:::ex
+a.
+| {#ex:dutch} Dutch (Germanic)
+| Deze zin is in het nederlands.
+| DEM sentence AUX in DET dutch.
+| This sentence is dutch.
+
+b.
+| {#ex:mapudungun} Mapudungun (Isolate)
+| küpatueyew chi ḻuan
+| come-APPL-INV-IND-3-3ACT DEF guanaco
+| 'The guanaco came to him.'
+:::
+```
+
+References to these sub-examples use the direct ID: `[@ex:dutch]` will format as (1a) and `[@ex:mapudungun]` as (1b), with no space between number and letter.
+
+When the header is empty (e.g., in a grammar where all examples are from the same language), place the ID on the otherwise empty header line:
+
+```
+:::ex
+a.
+| {#ex:first}
+| Deze zin is in het nederlands.
+| DEM sentence AUX in DET dutch.
+| This sentence is dutch.
+:::
+```
+
+**Manual suffix references (backwards compatible):** The older method of manually adding a suffix into the cross reference, simply separated from the identifier by a space, still works. For example, `[@lllast c]` will refer to the third sub-example of the last-but-two example. Formatted this will look like this: [@llast c], smile! However, note that the "c" has to be manually determined. It is simply a literal suffix that will be copied into the cross-reference. Something like `[@last hA1l0]` will work also, leading to [@last hA1l0] when formatted (which is of course nonsensical).
+
+The direct ID method is recommended for most use cases as it provides stable references that don't change when sub-examples are reordered.
+
+For exports that include attributes (like html), the examples have an explicit id of the form `exNUMBER` in which `NUMBER` is the actual number as given in the formatted output. Sub-examples with custom IDs are also available as HTML anchors and can be linked directly. This means that it is possible to refer to an example on any web-page by using the hash-mechanism to refer to a part of the web-page. For example `#ex4.7` at can be used to refer to the seventh example in the html-output of this readme (try [this link](https://cysouw.github.io/pandoc-ling/readme.html#ex4.7)). The id in this example has a chapter number '4' because in the html conversion I have set the option `addChapterNumber` to `true`. (Note: when numbers restart the count in each chapter with the option `restartAtChapter`, then the id is of the form `exCHAPTER.NUMBER`. This is necessary to resolve clashing ids, as the same number might then be used in different chapters.)
 
 I propose to use these ids also to refer to examples in citations when writing scholarly papers, e.g. (Cysouw 2021: #ex7), independent of whether the links actually resolve. In principle, such citations could easily be resolved when online publications are properly prepared. The same proposal could also work for other parts of research papers, for example using tags like `#sec, #fig, #tab, #eq` (see the Pandoc filter [`crossref-adapt`](https://github.com/cysouw/crossref-adapt)). To refer to paragraphs (which should replace page numbers in a future of adaptive design), I propose to use no tag, but directly add the number to the hash (see the Pandoc filter [`count-para`](https://github.com/cysouw/count-para) for a practical mechanism to add such numbering).
 
