@@ -459,19 +459,69 @@ end
 
 function formatGlossLine (s)
   -- turn uppercase in gloss into small caps
+  -- Only fully uppercase components are treated as glosses
+  
+  -- Check if this is a name abbreviation (e.g., "A." or "B.")
+  -- These end with a period and are typically short
+  if string.match(s, "^[%u][%u]?%.$") then
+    -- Name abbreviation - don't format
+    return {pandoc.Str(s)}
+  end
+  
+  -- Check if this looks like a proper name (starts with capital, then lowercase, no separators)
+  if string.match(s, "^[%u][%l][%l]") and not string.match(s, "[%-‑:=<>~%.%d]") then
+    -- Likely a proper name (e.g., "Antonio") - don't format
+    return {pandoc.Str(s)}
+  end
+  
   local split = {}
-  for lower,upper in string.gmatch(s, "(.-)([%u%d]+)") do
-    if lower ~= "" then
-      lower = pandoc.Str(lower)
-      table.insert(split, lower)
+  local pos = 1
+  
+  while pos <= #s do
+    -- Try to match lowercase/separator sequence
+    local lower_start, lower_end = string.find(s, "^[^%u%d]+", pos)
+    if lower_start then
+      table.insert(split, pandoc.Str(string.sub(s, lower_start, lower_end)))
+      pos = lower_end + 1
     end
-    upper = pandoc.SmallCaps(pandoc.text.lower(upper))
-    table.insert(split, upper)
+    
+    if pos <= #s then
+      -- Try to match an uppercase/digit sequence
+      local upper_start, upper_end = string.find(s, "^[%u%d]+", pos)
+      if upper_start then
+        local upper_text = string.sub(s, upper_start, upper_end)
+        -- Check if this uppercase sequence is followed by lowercase (making it mixed case)
+        local next_pos = upper_end + 1
+        if next_pos <= #s then
+          local next_char = string.sub(s, next_pos, next_pos)
+          if string.match(next_char, "%l") then
+            -- Mixed case (e.g., "Ind") - don't convert, treat whole thing as regular text
+            -- Find the end of this mixed-case word
+            local mixed_end = string.find(s, "[^%a%d]", next_pos)
+            if mixed_end then
+              mixed_end = mixed_end - 1
+            else
+              mixed_end = #s
+            end
+            table.insert(split, pandoc.Str(string.sub(s, upper_start, mixed_end)))
+            pos = mixed_end + 1
+          else
+            -- Fully uppercase - convert to smallcaps
+            table.insert(split, pandoc.SmallCaps(pandoc.text.lower(upper_text)))
+            pos = next_pos
+          end
+        else
+          -- At end of string and all uppercase - convert
+          table.insert(split, pandoc.SmallCaps(pandoc.text.lower(upper_text)))
+          pos = next_pos
+        end
+      else
+        -- Shouldn't happen, but handle gracefully
+        pos = pos + 1
+      end
+    end
   end
-  for leftover in string.gmatch(s, "[%u%d]+([‑%-:=<>~][^‑%-:=<>~]-%l+)$") do
-    leftover = pandoc.Str(leftover)
-    table.insert(split, leftover)
-  end
+  
   if #split == 0 then
     if s == "~" then s = "   " end -- sequence "space-nobreakspace-space"
     table.insert(split, pandoc.Str(s))
