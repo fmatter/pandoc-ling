@@ -444,11 +444,14 @@ end
 
 function getTrans (line)
   if formatGloss then
-    -- remove quotes and add singlequote througout
-    if line[1].tag == "Quoted" then
-      line = line[1].content
+    -- Check if user provided their own quotes
+    if line[1] and line[1].tag == "Quoted" then
+      -- User provided quotes - preserve everything as-is
+      -- This allows users to manually handle citations and formatting
+      return pandoc.Plain(line)
     end
     
+    -- No user quotes - apply automatic formatting
     -- Extract trailing citations and spaces to place them outside the quotes
     local citations = {}
     local i = #line
