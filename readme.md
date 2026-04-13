@@ -161,6 +161,7 @@ For interlinear examples with aligned source and gloss, the structure of a `line
 An attempt is made to format interlinear examples when the option `formatGloss=true` is added. This will:
 
 - remove formatting from the source and set everything in italics,
+- preserve symbols wrapped in `[text]{.normal}` spans in normal (upright) font, e.g. `[∅]{.normal}` renders ∅ in upright font while surrounding text is italicized (useful for zero morpheme markers and other special symbols),
 - remove formatting from the gloss and set sequences (>1) of capitals and numbers into small caps (note that the positioning of small caps on web pages is [highly complex](https://iamvdo.me/en/blog/css-font-metrics-line-height-and-vertical-align)),
 - a tilde `~` between spaces in the gloss is treated as a shortcut for an empty gloss (internally, the sequence `space-tilde-space` is replaced by `space-space-nonBreakingSpace-space-space`),
 - consistently put translations in single quotes, possibly removing other quotes.
@@ -171,6 +172,17 @@ An attempt is made to format interlinear examples when the option `formatGloss=t
 | Is deze zin in het nederlands ?
 | AUX DEM sentence in DET dutch Q
 | Is this sentence dutch?
+:::
+```
+
+To prevent specific symbols from being italicized in the source line, use the `[text]{.normal}` span syntax. This is particularly useful for zero morpheme markers:
+
+```
+::: {.ex formatGloss=true}
+| Salish language
+| n-[∅]{.normal}-s-xʷuy-tn-[Ø]{.normal}-as
+| LOC-[∅]{.normal}-NOM-go-DIR-[Ø]{.normal}-3ERG
+| 'when he went'
 :::
 ```
 

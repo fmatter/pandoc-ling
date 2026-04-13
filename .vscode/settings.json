@@ -2,5 +2,8 @@
   "spellright.language": [],
   "spellright.documentTypes": [
     "plaintext"
-  ]
+  ],
+  "chat.tools.terminal.autoApprove": {
+    "pytest": true
+  }
 }
