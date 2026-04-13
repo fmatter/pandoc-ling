@@ -1120,6 +1120,7 @@ function texMakeExpex (parsedDiv)
     elseif kind[i] == "interlinear" then
 
       header = parsedDiv.examples[i].header.content
+      local header2 = parsedDiv.examples[i].header2 and parsedDiv.examples[i].header2.content or nil
       source = parsedDiv.examples[i].source
       gloss  = parsedDiv.examples[i].gloss
       trans  = parsedDiv.examples[i].trans.content
@@ -1133,6 +1134,13 @@ function texMakeExpex (parsedDiv)
         texFront("\n  \\glpreamble ", header)
         texEnd("//", header)
       end
+      
+      if header2 and pandoc.utils.stringify(header2) == "" then
+        header2 = nil
+      elseif header2 then
+        texFront("\n  \\glpreamble ", header2)
+        texEnd("//", header2)
+      end
 
       if #kind > 1 then 
         texEnd("\n  \\a ", preamble)
@@ -1140,6 +1148,12 @@ function texMakeExpex (parsedDiv)
 
       texEnd("\n  \\begingl", preamble)
       preamble:extend(header)
+      
+      -- Add second header if present
+      if header2 then
+        preamble:extend(header2)
+      end
+      
       texFront("\n  \\gla ", judgements[i])
       preamble:extend(judgements[i])
       texEnd("//", source)
@@ -1218,6 +1232,7 @@ function texMakeLinguex (parsedDiv)
     elseif kind[i] == "interlinear" then
 
       header = parsedDiv.examples[i].header.content
+      local header2 = parsedDiv.examples[i].header2 and parsedDiv.examples[i].header2.content or nil
       source = parsedDiv.examples[i].source
       gloss  = parsedDiv.examples[i].gloss
       trans  = parsedDiv.examples[i].trans.content
@@ -1228,6 +1243,10 @@ function texMakeLinguex (parsedDiv)
       if pandoc.utils.stringify(header) == "" then
         header = pandoc.List()
       end
+      
+      if header2 and pandoc.utils.stringify(header2) == "" then
+        header2 = nil
+      end
 
       if #kind > 1 and i == 1 then 
         texFront("\n  \\a. ", header)
@@ -1236,8 +1255,20 @@ function texMakeLinguex (parsedDiv)
       --else
       --  texFront("\n  ", header)
       end
+      
+      -- Add line break after first header if there's a second header
+      if header2 then
+        texEnd("\\\\", header)
+      end
 
       preamble:extend(header)
+      
+      -- Add second header if present
+      if header2 then
+        texFront("\n      ", header2)
+        preamble:extend(header2)
+      end
+      
       texFront("\n  \\gll ", judgements[i])
       preamble:extend(judgements[i])
       texEnd("\\\\", source)
@@ -1324,6 +1355,7 @@ function texMakeGb4e (parsedDiv)
     elseif kind[i] == "interlinear" then
 
       header = parsedDiv.examples[i].header.content
+      local header2 = parsedDiv.examples[i].header2 and parsedDiv.examples[i].header2.content or nil
       source = parsedDiv.examples[i].source
       gloss  = parsedDiv.examples[i].gloss
       trans  = parsedDiv.examples[i].trans.content
@@ -1333,7 +1365,18 @@ function texMakeGb4e (parsedDiv)
 
       if pandoc.utils.stringify(header) == "" then
         header = pandoc.List()
-      else texFront("\n       ", header)
+      else 
+        texFront("\n       ", header)
+        -- Add line break after first header if there's a second header
+        if header2 then
+          texEnd("\\\\", header)
+        end
+      end
+      
+      if header2 and pandoc.utils.stringify(header2) == "" then
+        header2 = nil
+      elseif header2 then
+        texFront("\n       ", header2)
       end
 
       if #kind > 1 and i == 1 then 
@@ -1346,6 +1389,12 @@ function texMakeGb4e (parsedDiv)
 
       preamble:extend(judgements[i])
       preamble:extend(header)
+      
+      -- Add second header if present
+      if header2 then
+        preamble:extend(header2)
+      end
+      
       texFront("\n  \\gll ", source)
       texEnd("\\\\", source)
       preamble:extend(source)
@@ -1454,6 +1503,7 @@ function texMakeLangsci (parsedDiv)
     elseif kind[i] == "interlinear" then
 
       header = parsedDiv.examples[i].header.content
+      local header2 = parsedDiv.examples[i].header2 and parsedDiv.examples[i].header2.content or nil
       source = parsedDiv.examples[i].source
       gloss  = parsedDiv.examples[i].gloss
       trans  = parsedDiv.examples[i].trans.content
@@ -1467,6 +1517,13 @@ function texMakeLangsci (parsedDiv)
         texFront("\n       ", header)
         texEnd("\\\\*", header)
       end
+      
+      if header2 and pandoc.utils.stringify(header2) == "" then
+        header2 = nil
+      elseif header2 then
+        texFront("\n       ", header2)
+        texEnd("\\\\*", header2)
+      end
 
       if #kind > 1 and i == 1 then 
         texFront("\n  \\ea ", judgements[i])
@@ -1477,6 +1534,12 @@ function texMakeLangsci (parsedDiv)
       end
 
       preamble:extend(header)
+      
+      -- Add second header if present
+      if header2 then
+        preamble:extend(header2)
+      end
+      
       texFront("\n  \\gll ", source)
       texEnd("\\\\", source)
       preamble:extend(source)
