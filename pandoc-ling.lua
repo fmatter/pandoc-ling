@@ -1240,7 +1240,8 @@ function texMakeLinguex (parsedDiv)
       source = texCombine(source)
       gloss  = texCombine(gloss)
 
-      if pandoc.utils.stringify(header) == "" then
+      local headerEmpty = pandoc.utils.stringify(header) == ""
+      if headerEmpty then
         header = pandoc.List()
       end
       
@@ -1256,8 +1257,8 @@ function texMakeLinguex (parsedDiv)
       --  texFront("\n  ", header)
       end
       
-      -- Add line break after first header if there's a second header
-      if header2 then
+      -- Add line break after first header if there's a second header AND header is not empty
+      if header2 and not headerEmpty then
         texEnd("\\\\", header)
       end
 
