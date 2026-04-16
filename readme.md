@@ -218,6 +218,48 @@ Also, as a quick workaround for showing multiple source lines without alignment 
 :::
 ```
 
+## Tabular examples
+
+For examples that require tabular alignment (paradigms, derivational processes, etc.), use a Pandoc table inside a div with class `extable`. This generates simple `tabular` environments in LaTeX (without borders or rules) and nested tables in HTML.
+
+```
+::: {.ex}
+
+::: {.extable}
+
+|     | sg  | pl  |
+| --- | --- | --- |
+| 1   | ìg  | mìr |
+| 2   | dù  | dìr |
+| 3   | är  | sì  |
+
+:::
+
+:::
+```
+
+Tabulars can be combined with preambles just like other example types:
+
+```
+::: {.ex}
+
+Personal pronouns (Everett 1986:281):
+
+::: {.extable}
+
+|          | [sg]{.gl}  | [pl]{.gl}  |
+| -------- | ---------- | ---------- |
+| [1]{.gl} | [ìg]{.ob}  | [mìr]{.ob} |
+| [2]{.gl} | [dù]{.ob}  | [dìr]{.ob} |
+| [3]{.gl} | [är]{.ob}  | [sì]{.ob}  |
+
+:::
+
+:::
+```
+
+The table will be rendered as a simple `\begin{tabular}[t]{@{}lll@{}}` environment in LaTeX (with column alignments from the Markdown table) and as a nested table in HTML. This is particularly useful for paradigms and other structured linguistic data that don't fit the interlinear glossing format.
+
 ## Cross-referencing examples
 
 The examples are automatically numbered by `pandoc-ling`. Cross-references to examples inside a document can be made by using the `[@ID]` format (used by Pandoc for citations). When an example has an explicit identifier (like `#test` in the next example), then a reference can be made to this example with `[@test]`, leading to [@test] when formatted (note that the formatting does not work on the github website. Please check the 'docs' subdirectory).
