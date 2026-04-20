@@ -229,7 +229,7 @@ function processDiv (div)
 
   -- keep track of chapters (header == 1)
   -- included in this loop by trick "addDivToHeader"
-  if div.content[1].tag == "Header" and div.content[1].classes[1] == "restart"  then
+  if div.content[1] and div.content[1].tag == "Header" and div.content[1].classes[1] == "restart"  then
     chapter = chapter + 1
     counterInChapter = 0
     div.content[1].attr = {id = div.content[1].identifier, class = ""}
