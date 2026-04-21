@@ -1341,6 +1341,10 @@ function texMakeLinguex (parsedDiv)
     elseif kind[i] == "table" then
       -- Convert the Pandoc Table to simple tabular
       local tabular = texMakeTabular(parsedDiv.examples[i])
+      -- Add line break after preamble if present
+      if parsedDiv.preamble then
+        texEnd("\\\\", preamble)
+      end
       -- Add the tabular to preamble
       texEnd("\n  ", preamble)
       preamble:extend(tabular)
@@ -1455,6 +1459,10 @@ function texMakeGb4e (parsedDiv)
     elseif kind[i] == "table" then
       -- Convert the Pandoc Table to simple tabular
       local tabular = texMakeTabular(parsedDiv.examples[i])
+      -- Add line break after preamble if present
+      if parsedDiv.preamble then
+        texEnd("\\\\", preamble)
+      end
       texEnd("\n  ", preamble)
       preamble:extend(tabular)
     end
@@ -1591,6 +1599,10 @@ function texMakeLangsci (parsedDiv)
     elseif kind[i] == "table" then
       -- Convert the Pandoc Table to simple tabular
       local tabular = texMakeTabular(parsedDiv.examples[i])
+      -- Add line break after preamble if present
+      if parsedDiv.preamble then
+        texEnd("\\\\", preamble)
+      end
       if #kind > 1 and i == 1 then
         texEnd("\n  \\ea ", preamble)
       elseif #kind > 1 and i > 1 then
