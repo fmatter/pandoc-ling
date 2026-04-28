@@ -729,7 +729,7 @@ function pandocMakeInterlinear (parsedDiv, label, forceJudge)
     example.bodies[1].body[1+hs+ps].cells[2+ls].attr = {class = "linguistic-example-judgement"}
   end
   -- set class of source and gloss
-  local ssCol = 3 + ls -- sourcestart columns
+  local ssCol = 2 + ls + js -- sourcestart columns
   local ssRow = 1 + hs + ps -- sourcestart row
   for i=ssCol,nCols do
     example.bodies[1].body[ssRow].cells[i].attr = {class = "linguistic-example-source linguistic-example-content"}
